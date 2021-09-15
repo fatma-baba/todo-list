@@ -1,0 +1,31 @@
+.full {
+    width: 100%;
+}
+ul {
+    align-self: center;
+    width: 50%;
+    margin: 0;
+}
+ul li {
+    list-style: none;
+    width: 100%;
+    padding: 10px;
+    margin: 0;
+    /* border-top: 1px solid salmon; */
+    border-bottom: 1px solid salmon;
+}
+
+ul li h4 {
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+.done {
+    text-decoration: line-through;
+    color: red;
+    text-decoration-color: hotpink;
+}
+
+.still {
+    color: black;
+}
