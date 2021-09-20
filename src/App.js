@@ -7,12 +7,14 @@ function App() {
   return (
     <Container>
   <Row>
+    <Col></Col>
     <Col>
     <div className="App">
       <h1>My TODO list</h1>
       <List/>
     </div>
     </Col>
+    <Col></Col>
   </Row>
 </Container>
     
