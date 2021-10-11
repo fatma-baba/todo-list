@@ -1,64 +1,39 @@
 import React, { useState } from 'react'
 import { Form, Button, Col, Row } from 'react-bootstrap'
+import { connect } from 'react-redux'
+import { addTask, removeTask, completeTask, editTask } from '../action'
 import './list.css'
-const List = () => {
-    const [tasks, setTasks] = useState([
-        {
-            title: 'Learn component',
-            done: false
-        },
-        {
-            title: 'Learn props',
-            done: false
-        },
-        {
-            title: 'Learn state',
-            done: false
-        },
-        {
-            title: 'Learn html',
-            done: false
-        },
-        {
-            title: 'Learn state',
-            done: false
-        }
-    ])
-    const [toadd_task, setToadd_task] = useState('')
-    const [toEditTask, setToEditTask] = useState()
 
-    const handleEditClick = (index) => {
+const List = ({appState, addNewTask, removeTask, completeTask, editTask}) => {
+
+    const [toadd_task, setToadd_task] = useState('') // pour add
+    const [toEditTask, setToEditTask] = useState() // pour edit
+    function handleAddTask() {
+        const task = { title: toadd_task, done: false }
+        addNewTask(task)
+    }
+
+    const handleRemoveTask = (index) => {
+        removeTask(index)
+    }
+
+    const handleEdit = (index) => {
         if(toEditTask && index == toEditTask.index){
-            const new_tasks = [...tasks]
-            new_tasks[index].title = toEditTask.value
-            setTasks(new_tasks)
+            editTask({id: toEditTask.index, title: toEditTask.value})
             setToEditTask()
         } else {
             setToEditTask({
                 index: index,
-                value: tasks[index].title
+                value: appState.tasks[index].title
             })
         }
     }
 
     // switch the task false (to mark it completed or not)
-    const handleClick = (index) => {
-        let new_tasks = [...tasks]; // to get values not reference
-        new_tasks[index].done = !new_tasks[index].done
-        setTasks(new_tasks)
+    const handleComplete = (index) => {
+        completeTask(index)
     }
 
-    // add task to the list
-    const addTask = () => {
-        setTasks([...tasks, { title: toadd_task, done: false }])
-    }
-
-    // remove task from tasks list
-    const removeTask = (index) => {
-        let new_tasks = [...tasks]; // to get values not reference
-        new_tasks.splice(index, 1)
-        setTasks(new_tasks)
-    }
 
 
     return (
@@ -68,14 +43,14 @@ const List = () => {
                     <Form.Control type="text" onChange={e => setToadd_task(e.currentTarget.value)} value={toadd_task} placeholder="Enter Task" />
                 </Form.Group>
                 <Col md>
-                    <Button className="full" onClick={e => addTask()} variant="primary" >
+                    <Button className="full" onClick={e => handleAddTask()} variant="primary" >
                         Add
                     </Button>
                 </Col>
             </Row>
             <Row>
                 <ul>
-                    {tasks.map((task, index) => (
+                    {appState.tasks.map((task, index) => (
                         <li key={index} className={task.done ? "done" : "still"}>
                             <Col>
                                 <Row>
@@ -86,13 +61,13 @@ const List = () => {
                                 </Row>}
                                 <Row>
                                     <Col>
-                                        <Button className="full" variant="outline-success" onClick={e => handleClick(index)}>Complete</Button>
+                                        <Button className="full" variant="outline-success" onClick={e => handleComplete(index)}>{task.done ? 'uncomplete' : 'complete'}</Button>
                                     </Col>
                                     <Col>
-                                        <Button className="full" variant="outline-danger" onClick={e => removeTask(index)}>Delete</Button>
+                                        <Button className="full" variant="outline-danger" onClick={e => handleRemoveTask(index)}>Delete</Button>
                                     </Col>
                                     <Col>
-                                        <Button className="full" variant="primary" onClick={e => handleEditClick(index)}>Edit</Button>
+                                        <Button className="full" variant={toEditTask && toEditTask.index == index ? "success" : "secondary"} onClick={e => handleEdit(index)}>{toEditTask && toEditTask.index == index ?  "save": "edit"}</Button>
                                     </Col>
                                 </Row>
                                 <Row>
@@ -107,4 +82,15 @@ const List = () => {
 
 }
 
-export default List
+const mapStateToProps = (state) => ({
+    appState: state
+})
+
+const mapDispatchToProps = (dispatch) => ({
+    addNewTask: (task) => dispatch(addTask(task)),
+    removeTask: (id) => dispatch(removeTask(id)),
+    completeTask: (id) => dispatch(completeTask(id)),
+    editTask: ({id, title}) => dispatch(editTask({id, title}))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(List)
